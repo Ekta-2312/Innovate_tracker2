@@ -182,6 +182,8 @@ function App() {
   const [currentCoords, setCurrentCoords] = React.useState<{ lat: number, lng: number, acc: number } | null>(null);
   const [mobileNumber, setMobileNumber] = React.useState('');
   const [locationStatus, setLocationStatus] = React.useState<'getting' | 'success' | 'error' | 'denied'>('getting');
+  const [requestDetails, setRequestDetails] = React.useState<any>(null);
+  const [isClosed, setIsClosed] = React.useState(false);
 
   // Extract requestId from URL path and token from query params
   const urlPath = window.location.pathname;
@@ -191,19 +193,28 @@ function App() {
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get('token');
 
-  // Debug URL parameters
+  // Auto-fetch location and request details when component mounts
   React.useEffect(() => {
-    console.log('Component mounted - URL:', window.location.href);
-    console.log('Component mounted - URL path:', window.location.pathname);
-    console.log('Component mounted - Search params:', window.location.search);
-    console.log('Component mounted - Extracted requestId from path:', requestId);
-    console.log('Component mounted - token:', token);
-  }, [token, requestId]);
-
-  // Auto-fetch location when component mounts
-  React.useEffect(() => {
+    fetchRequestDetails();
     getCurrentLocation();
   }, []);
+
+  const fetchRequestDetails = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/bloodrequest/${requestId}`);
+      const data = await res.json();
+
+      if (data.status === 'closed') {
+        setIsClosed(true);
+        setResult(`<div class="closed-message"><h3>${data.message}</h3></div>`);
+      } else {
+        setRequestDetails(data);
+      }
+    } catch (err) {
+      console.error('Error fetching request details:', err);
+    }
+  };
+
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
@@ -404,15 +415,15 @@ function App() {
           </div>
         )}
 
-        {/* Location Status */}
-        {locationStatus === 'getting' && (
+        {/* Location Status - Only show if not closed */}
+        {!isClosed && locationStatus === 'getting' && (
           <div className="card status-getting">
             <h3>🔍 Detecting Your Location...</h3>
             <p>Please allow location access when prompted by your browser.</p>
           </div>
         )}
 
-        {locationStatus === 'denied' && (
+        {!isClosed && locationStatus === 'denied' && (
           <div className="card status-denied">
             <h3>❌ Location Access Required</h3>
             <p>This app needs your location to respond to the blood request.</p>
@@ -422,16 +433,17 @@ function App() {
           </div>
         )}
 
-        {locationStatus === 'success' && (
+        {!isClosed && locationStatus === 'success' && (
           <div className="card status-success">
             <h3>✅ Location Captured Successfully!</h3>
             <p>Please fill in your details below to respond to the blood request.</p>
           </div>
         )}
 
-        {/* Form - Only show when location is captured */}
-        {locationStatus === 'success' && (
+        {/* Form - Only show when location is captured and NOT closed */}
+        {!isClosed && locationStatus === 'success' && (
           <div className="card form-card">
+
             <h3 className="form-title">📱 Enter Your Mobile Number</h3>
             <div style={{ marginBottom: '20px' }}>
               <input
