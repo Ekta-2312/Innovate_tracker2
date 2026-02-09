@@ -1,0 +1,10 @@
+node_modules
+dist
+client/build
+client/node_modules
+/public
+*.log
+.env
+.DS_Store
+.vscode
+.vercel

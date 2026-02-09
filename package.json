@@ -1,0 +1,31 @@
+{
+  "name": "donor_location",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node server.ts",
+    "build": "tsc && cd client && npm install && npm run build && cd .. && node -e \"const fs = require('fs'); if (!fs.existsSync('public')) fs.mkdirSync('public', {recursive: true}); const { execSync } = require('child_process'); if (process.platform === 'win32') { execSync('xcopy /E /I /Y client\\\\build\\\\* public\\\\'); } else { execSync('cp -r client/build/* public/'); }\"",
+    "start": "node dist/server.js",
+    "vercel-build": "npm install && tsc && cd client && npm install && npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/axios": "^0.9.36",
+    "@vercel/node": "^3.0.0",
+    "axios": "^1.11.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^24.1.0",
+    "typescript": "^5.8.3"
+  }
+}

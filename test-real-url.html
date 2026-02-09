@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real URL Structure Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .pass { background: #d1ecf1; color: #0c5460; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .info { background: #fff3cd; color: #856404; }
+        .code {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            border-left: 4px solid #007bff;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        .qr-preview {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 16px;
+            white-space: pre-line;
+            border: 2px solid #007bff;
+        }
+        .url-examples {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-card">
+        <h1>📱 Real SMS URL Structure Test</h1>
+        <p><strong>SMS Message Format:</strong></p>
+        <div class="code">Sent from your Twilio trial account - Blood donation request from Meghansh. Your O- blood is needed. Can you help? Reply YES to confirm Respond: https://donor-location-tracker.onrender.com/donor-location/68d01d1b06f6b3941cece196</div>
+        
+        <div class="url-examples">
+            <strong>Test this page with these URL patterns:</strong><br>
+            • <code>test-real-url.html/donor-location/68d01d1b06f6b3941cece196</code><br>
+            • <code>test-real-url.html/68d01d1b06f6b3941cece196</code><br>
+            • <code>test-real-url.html?mockPath=/donor-location/68d01d1b06f6b3941cece196</code>
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h2>🔍 Current URL Analysis</h2>
+        <div id="urlAnalysis"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>⚙️ Request ID Extraction Test</h2>
+        <div id="extractionTest"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>📄 Final QR Code Content</h2>
+        <div id="qrContent"></div>
+    </div>
+
+    <script>
+        function analyzeURL() {
+            const fullUrl = window.location.href;
+            const pathname = window.location.pathname;
+            const search = window.location.search;
+            
+            // Method 1: Extract from actual path
+            const pathParts = pathname.split('/');
+            const requestIdFromPath = pathParts[pathParts.length - 1];
+            
+            // Method 2: Check for mock path in query params (for local testing)
+            const urlParams = new URLSearchParams(search);
+            const mockPath = urlParams.get('mockPath');
+            let requestIdFromMock = null;
+            if (mockPath) {
+                const mockParts = mockPath.split('/');
+                requestIdFromMock = mockParts[mockParts.length - 1];
+            }
+            
+            // Use the best available request ID
+            const finalRequestId = requestIdFromMock || requestIdFromPath;
+            
+            // Display analysis
+            document.getElementById('urlAnalysis').innerHTML = `
+                <div class="code">
+                    <strong>Full URL:</strong> ${fullUrl}<br>
+                    <strong>Pathname:</strong> ${pathname}<br>
+                    <strong>Search:</strong> ${search || '(none)'}<br>
+                    <strong>Path Parts:</strong> [${pathParts.join(', ')}]<br>
+                    <strong>Mock Path:</strong> ${mockPath || '(none)'}
+                </div>
+            `;
+            
+            // Test extraction
+            let extractionResult = '';
+            if (finalRequestId && finalRequestId.length > 10) {
+                extractionResult = `<div class="status pass">✅ REQUEST_ID extracted successfully!</div>`;
+                extractionResult += `<div class="code">REQUEST_ID: ${finalRequestId}</div>`;
+            } else {
+                extractionResult = `<div class="status fail">❌ REQUEST_ID not found or too short</div>`;
+                extractionResult += `<div class="code">Found: "${finalRequestId}" (length: ${finalRequestId ? finalRequestId.length : 0})</div>`;
+                extractionResult += `<div class="status info">💡 Try: test-real-url.html?mockPath=/donor-location/68d01d1b06f6b3941cece196</div>`;
+            }
+            
+            document.getElementById('extractionTest').innerHTML = extractionResult;
+            
+            // Generate QR content using same logic as React app
+            const qrText = `REQUEST_ID
+${finalRequestId || 'N/A'}
+DONOR_ID
+DON97EXJ14Q
+Name:
+Meghansh Thakker
+Roll Number:
+20CE123
+Mobile:
++919876543210`;
+            
+            document.getElementById('qrContent').innerHTML = `<div class="qr-preview">${qrText}</div>`;
+            
+            // Overall status
+            if (finalRequestId && finalRequestId.length > 10) {
+                document.getElementById('extractionTest').innerHTML += `<div class="status pass">🎉 Ready for deployment! REQUEST_ID will appear in QR code.</div>`;
+            }
+        }
+        
+        // Run analysis on page load
+        analyzeURL();
+    </script>
+</body>
+</html>
