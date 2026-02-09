@@ -123,7 +123,7 @@ app.post('/api/bloodrequest/confirm', async (req, res) => {
     }
 
     // Final check for status update
-    if (updatedRequest.confirmedUnits >= updatedRequest.quantity) {
+    if ((updatedRequest.confirmedUnits || 0) >= (updatedRequest.quantity || 0)) {
       updatedRequest.status = 'fulfilled';
       await updatedRequest.save();
     }
@@ -147,7 +147,7 @@ function haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
 
 const hospitalLat = 22.6023;
 const hospitalLng = 72.8205;
-const geofenceRadiusKm = 50;
+const geofenceRadiusKm = 100;
 
 app.post('/api/save-location', async (req, res) => {
   try {
