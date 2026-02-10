@@ -37,7 +37,7 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5000",
+  "proxy": "http://https://innovate-backend2.onrender.com",
   "devDependencies": {
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7"
