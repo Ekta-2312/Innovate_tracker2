@@ -72,7 +72,10 @@ app.get('/api/bloodrequest/:id', async (req, res) => {
     if (!request) return res.status(404).json({ error: 'Request not found' });
 
     const now = new Date();
-    const isExpired = now > new Date(request.requiredBy);
+    const isExpired = request.requiredBy
+      ? now > request.requiredBy
+      : false;
+
     const isFull = (request.confirmedUnits || 0) >= (request.quantity || 0);
 
     // Update status if needed
